@@ -16,11 +16,73 @@
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4rp-Hs-LCH">
+                                <rect key="frame" x="200" y="20" width="200" height="30"/>
+                                <color key="backgroundColor" red="0.93725490199999995" green="0.93725490199999995" blue="0.95686274510000002" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="200" id="LcS-Ad-ZEY"/>
+                                </constraints>
+                                <state key="normal" title="Login with Facebook"/>
+                                <connections>
+                                    <action selector="loginFacebookPress:" destination="BYZ-38-t0r" eventType="touchUpInside" id="CXT-s3-dBQ"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="feO-rC-ZLT">
+                                <rect key="frame" x="200" y="58" width="200" height="30"/>
+                                <color key="backgroundColor" red="0.93725490199999995" green="0.93725490199999995" blue="0.95686274510000002" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="200" id="TZV-5J-HWy"/>
+                                </constraints>
+                                <state key="normal" title="Login with Google"/>
+                                <connections>
+                                    <action selector="loginFacebookPress:" destination="BYZ-38-t0r" eventType="touchUpInside" id="ZyN-ZF-aux"/>
+                                    <action selector="loginGooglePress:" destination="BYZ-38-t0r" eventType="touchUpInside" id="UQB-E9-Kwh"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="I9R-rr-1tm">
+                                <rect key="frame" x="200" y="550" width="200" height="30"/>
+                                <color key="backgroundColor" red="0.93725490199999995" green="0.93725490199999995" blue="0.95686274510000002" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="200" id="Mbp-AA-5sb"/>
+                                </constraints>
+                                <state key="normal" title="Logout"/>
+                                <connections>
+                                    <action selector="logoutPress:" destination="BYZ-38-t0r" eventType="touchUpInside" id="p7Y-0x-TWY"/>
+                                </connections>
+                            </button>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="Ybn-On-ukn">
+                                <rect key="frame" x="8" y="96" width="584" height="446"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                        </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="Ybn-On-ukn" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" constant="8" id="F8h-ff-MIB"/>
+                            <constraint firstItem="feO-rC-ZLT" firstAttribute="top" secondItem="4rp-Hs-LCH" secondAttribute="bottom" constant="8" id="MCI-dv-poU"/>
+                            <constraint firstItem="I9R-rr-1tm" firstAttribute="top" secondItem="Ybn-On-ukn" secondAttribute="bottom" constant="8" id="PHR-lD-Uxv"/>
+                            <constraint firstItem="4rp-Hs-LCH" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="Zt7-15-67z"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="I9R-rr-1tm" secondAttribute="bottom" constant="20" id="aVn-mK-hj6"/>
+                            <constraint firstItem="I9R-rr-1tm" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="dm8-fR-qdK"/>
+                            <constraint firstItem="Ybn-On-ukn" firstAttribute="top" secondItem="feO-rC-ZLT" secondAttribute="bottom" constant="8" id="drG-JM-qnD"/>
+                            <constraint firstAttribute="trailing" secondItem="Ybn-On-ukn" secondAttribute="trailing" constant="8" id="vaj-iG-i89"/>
+                            <constraint firstItem="feO-rC-ZLT" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="vp2-uI-BM7"/>
+                            <constraint firstItem="Ybn-On-ukn" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="xky-OF-pGE"/>
+                            <constraint firstItem="4rp-Hs-LCH" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="zr6-Ha-Er7"/>
+                        </constraints>
                     </view>
+                    <connections>
+                        <outlet property="display" destination="Ybn-On-ukn" id="Cax-cJ-lTU"/>
+                        <outlet property="loginButtonFacebook" destination="4rp-Hs-LCH" id="e6J-oV-UFi"/>
+                        <outlet property="loginButtonGoogle" destination="feO-rC-ZLT" id="8Fe-UQ-giB"/>
+                        <outlet property="logoutButton" destination="I9R-rr-1tm" id="g4f-Tb-G2v"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="628" y="64"/>
         </scene>
     </scenes>
 </document>
