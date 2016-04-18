@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6B5BBB561CC4CABE00B2ABC3 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6B5BBB551CC4CABE00B2ABC3 /* GoogleService-Info.plist */; };
 		6BE3735D1CC0462700FD45EA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BE3735C1CC0462700FD45EA /* AppDelegate.swift */; };
 		6BE3735F1CC0462700FD45EA /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BE3735E1CC0462700FD45EA /* ViewController.swift */; };
 		6BE373621CC0462700FD45EA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6BE373601CC0462700FD45EA /* Main.storyboard */; };
@@ -17,6 +18,7 @@
 
 /* Begin PBXFileReference section */
 		39C66334CD10D533394BDC93 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
+		6B5BBB551CC4CABE00B2ABC3 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		6B9AF8241CC055A600475BF5 /* SocialConnect-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SocialConnect-Bridging-Header.h"; sourceTree = "<group>"; };
 		6BE373591CC0462700FD45EA /* SocialConnect.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SocialConnect.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6BE3735C1CC0462700FD45EA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -69,6 +71,7 @@
 				6B9AF8241CC055A600475BF5 /* SocialConnect-Bridging-Header.h */,
 				6BE373651CC0462700FD45EA /* LaunchScreen.storyboard */,
 				6BE373681CC0462700FD45EA /* Info.plist */,
+				6B5BBB551CC4CABE00B2ABC3 /* GoogleService-Info.plist */,
 			);
 			path = SocialConnect;
 			sourceTree = "<group>";
@@ -152,6 +155,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6BE373671CC0462700FD45EA /* LaunchScreen.storyboard in Resources */,
+				6B5BBB561CC4CABE00B2ABC3 /* GoogleService-Info.plist in Resources */,
 				6BE373641CC0462700FD45EA /* Assets.xcassets in Resources */,
 				6BE373621CC0462700FD45EA /* Main.storyboard in Resources */,
 			);

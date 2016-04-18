@@ -9,7 +9,7 @@
 import UIKit
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate /*, GIDSignInDelegate */ {
 
     var window: UIWindow?
 
@@ -17,6 +17,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
         //return true
+        
+        //############################
+        //Google SignIn
+        // Initialize sign-in
+        var configureError: NSError?
+        GGLContext.sharedInstance().configureWithError(&configureError)
+        assert(configureError == nil, "Error configuring Google services: \(configureError)")
+        
+        //GIDSignIn.sharedInstance().delegate = self
+        //############################
+        
         
         //FB
         return FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
@@ -45,18 +56,58 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
+    
 
-    //MARKS - FB
-    func application(application: UIApplication,
-                     openURL url: NSURL,
-                             sourceApplication: String?,
-                             annotation: AnyObject) -> Bool {
-        return FBSDKApplicationDelegate.sharedInstance().application(
-            application,
-            openURL: url,
-            sourceApplication: sourceApplication,
-            annotation: annotation)
+    //MARKS - FB & Google
+    //iOS 8 or below
+    func application(application: UIApplication, openURL url: NSURL, sourceApplication: String?, annotation: AnyObject) -> Bool {
+        
+        //FB
+        let facebookReturnValue = FBSDKApplicationDelegate.sharedInstance().application(application, openURL: url, sourceApplication: sourceApplication, annotation: annotation)
+        
+        //Google
+        let googleReturnValue = GIDSignIn.sharedInstance().handleURL(url, sourceApplication: sourceApplication, annotation: annotation)
+        
+        return facebookReturnValue || googleReturnValue
     }
+    
+    
+    //IOS 9
+    @available(iOS 9.0, *)
+    func application(application: UIApplication, openURL url: NSURL, options: [String: AnyObject]) -> Bool {
+        
+        let sourceApplication = options[UIApplicationOpenURLOptionsSourceApplicationKey] as? String
+        let annotation = options[UIApplicationOpenURLOptionsAnnotationKey]
+        
+        //FB
+        let facebookReturnValue = FBSDKApplicationDelegate.sharedInstance().application(application, openURL: url, sourceApplication: sourceApplication, annotation: annotation)
+        
+        //Google
+        let googleReturnValue = GIDSignIn.sharedInstance().handleURL(url, sourceApplication: sourceApplication, annotation: annotation)
+        
+        return facebookReturnValue || googleReturnValue
+    }
+    
+    //MARK: - GIDSignInDelegate
+//    func signIn(signIn: GIDSignIn!, didSignInForUser user: GIDGoogleUser!,  withError error: NSError!) {
+//        if (error == nil) {
+//            // Perform any operations on signed in user here.
+//            let userId = user.userID                  // For client-side use only!
+//            let idToken = user.authentication.idToken // Safe to send to the server
+//            let fullName = user.profile.name
+//            let givenName = user.profile.givenName
+//            let familyName = user.profile.familyName
+//            let email = user.profile.email
+//            // ...
+//        } else {
+//            print("\(error.localizedDescription)")
+//        }
+//    }
+    
+//    func signIn(signIn: GIDSignIn!, didDisconnectWithUser user:GIDGoogleUser!, withError error: NSError!) {
+//        // Perform any operations when the user disconnects from app here.
+//        // ...
+//    }
 
 }
 

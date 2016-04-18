@@ -11,4 +11,4 @@ pod 'FBSDKLoginKit'
 #pod 'FBSDKShareKit'
 
 #Google SignIn
-#pod 'Google/SignIn'
+pod 'Google/SignIn'
