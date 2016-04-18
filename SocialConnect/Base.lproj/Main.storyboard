@@ -36,7 +36,6 @@
                                 </constraints>
                                 <state key="normal" title="Login with Google"/>
                                 <connections>
-                                    <action selector="loginFacebookPress:" destination="BYZ-38-t0r" eventType="touchUpInside" id="ZyN-ZF-aux"/>
                                     <action selector="loginGooglePress:" destination="BYZ-38-t0r" eventType="touchUpInside" id="UQB-E9-Kwh"/>
                                 </connections>
                             </button>
@@ -51,22 +50,48 @@
                                     <action selector="logoutPress:" destination="BYZ-38-t0r" eventType="touchUpInside" id="p7Y-0x-TWY"/>
                                 </connections>
                             </button>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="Ybn-On-ukn">
-                                <rect key="frame" x="8" y="96" width="584" height="446"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="Ybn-On-ukn">
+                                <rect key="frame" x="8" y="96" width="584" height="370"/>
+                                <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0LD-gK-5D2">
+                                <rect key="frame" x="200" y="474" width="200" height="30"/>
+                                <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="200" id="bdf-tG-BSm"/>
+                                </constraints>
+                                <state key="normal" title="FB User Data"/>
+                                <connections>
+                                    <action selector="getFBUserData:" destination="BYZ-38-t0r" eventType="touchUpInside" id="NtO-uF-gZt"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FPh-Dn-aXt">
+                                <rect key="frame" x="200" y="512" width="200" height="30"/>
+                                <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="200" id="Xkt-jT-GKN"/>
+                                </constraints>
+                                <state key="normal" title="FB ids For Business"/>
+                                <connections>
+                                    <action selector="getFBIdsForBusiness:" destination="BYZ-38-t0r" eventType="touchUpInside" id="wBI-1I-j2R"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="Ybn-On-ukn" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" constant="8" id="F8h-ff-MIB"/>
                             <constraint firstItem="feO-rC-ZLT" firstAttribute="top" secondItem="4rp-Hs-LCH" secondAttribute="bottom" constant="8" id="MCI-dv-poU"/>
-                            <constraint firstItem="I9R-rr-1tm" firstAttribute="top" secondItem="Ybn-On-ukn" secondAttribute="bottom" constant="8" id="PHR-lD-Uxv"/>
+                            <constraint firstItem="FPh-Dn-aXt" firstAttribute="top" secondItem="0LD-gK-5D2" secondAttribute="bottom" constant="8" id="PXV-XF-kIw"/>
                             <constraint firstItem="4rp-Hs-LCH" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="Zt7-15-67z"/>
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="I9R-rr-1tm" secondAttribute="bottom" constant="20" id="aVn-mK-hj6"/>
                             <constraint firstItem="I9R-rr-1tm" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="dm8-fR-qdK"/>
                             <constraint firstItem="Ybn-On-ukn" firstAttribute="top" secondItem="feO-rC-ZLT" secondAttribute="bottom" constant="8" id="drG-JM-qnD"/>
+                            <constraint firstItem="0LD-gK-5D2" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="kgl-LO-iRB"/>
+                            <constraint firstItem="0LD-gK-5D2" firstAttribute="top" secondItem="Ybn-On-ukn" secondAttribute="bottom" constant="8" id="mnb-tE-eNg"/>
+                            <constraint firstItem="FPh-Dn-aXt" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="nBI-Ab-7Ws"/>
+                            <constraint firstItem="I9R-rr-1tm" firstAttribute="top" secondItem="FPh-Dn-aXt" secondAttribute="bottom" constant="8" id="noS-Az-LLV"/>
                             <constraint firstAttribute="trailing" secondItem="Ybn-On-ukn" secondAttribute="trailing" constant="8" id="vaj-iG-i89"/>
                             <constraint firstItem="feO-rC-ZLT" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="vp2-uI-BM7"/>
                             <constraint firstItem="Ybn-On-ukn" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="xky-OF-pGE"/>
@@ -82,7 +107,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="628" y="64"/>
+            <point key="canvasLocation" x="544" y="-63"/>
         </scene>
     </scenes>
 </document>

@@ -12,7 +12,7 @@
 		6BE373621CC0462700FD45EA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6BE373601CC0462700FD45EA /* Main.storyboard */; };
 		6BE373641CC0462700FD45EA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6BE373631CC0462700FD45EA /* Assets.xcassets */; };
 		6BE373671CC0462700FD45EA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6BE373651CC0462700FD45EA /* LaunchScreen.storyboard */; };
-		A444381665002C789D0E53F2 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA059B41D086F44C47A47C0A /* libPods.a */; };
+		C2DE01ECA0C611DE981DEF9A /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DE2AAE2C5853459634FCB4A8 /* Pods.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,7 +26,7 @@
 		6BE373661CC0462700FD45EA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		6BE373681CC0462700FD45EA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		746D5E87E59DAFA789411DD9 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
-		EA059B41D086F44C47A47C0A /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		DE2AAE2C5853459634FCB4A8 /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -34,7 +34,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A444381665002C789D0E53F2 /* libPods.a in Frameworks */,
+				C2DE01ECA0C611DE981DEF9A /* Pods.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -85,7 +85,7 @@
 		E27EAB466039199BE1642A0E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				EA059B41D086F44C47A47C0A /* libPods.a */,
+				DE2AAE2C5853459634FCB4A8 /* Pods.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -276,7 +276,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -316,7 +316,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -330,8 +330,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = SocialConnect/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.elabvision.SocialConnect;
+				PRODUCT_BUNDLE_IDENTIFIER = com.hypebeast.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "SocialConnect/SocialConnect-Bridging-Header.h";
 			};
@@ -343,8 +344,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = SocialConnect/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.elabvision.SocialConnect;
+				PRODUCT_BUNDLE_IDENTIFIER = com.hypebeast.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "SocialConnect/SocialConnect-Bridging-Header.h";
 			};

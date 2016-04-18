@@ -7,15 +7,16 @@
 //
 
 import UIKit
+import FBSDKLoginKit
+import SwiftyJSON
 
 class ViewController: UIViewController {
+    
     @IBOutlet weak var loginButtonFacebook: UIButton!
-
     @IBOutlet weak var loginButtonGoogle: UIButton!
-    
     @IBOutlet weak var logoutButton: UIButton!
-    
     @IBOutlet weak var display: UITextView!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
@@ -28,15 +29,11 @@ class ViewController: UIViewController {
         if (FBSDKAccessToken.currentAccessToken() != nil)
         {
             // User is already logged in, do work such as go to next view controller.
-            self.loginButtonFacebook.hidden = true
-            self.loginButtonGoogle.hidden = true
-            self.logoutButton.hidden = false
+            self.showLoginButton(false)
         }
         else
         {
-            self.loginButtonFacebook.hidden = false
-            self.loginButtonGoogle.hidden = false
-            self.logoutButton.hidden = true
+            self.showLoginButton(true)
             
 //            let loginView : FBSDKLoginButton = FBSDKLoginButton()
 //            self.view.addSubview(loginView)
@@ -54,16 +51,15 @@ class ViewController: UIViewController {
     //MARK: - IBAction
     
     @IBAction func loginFacebookPress(sender: AnyObject) {
-        let login = FBSDKLoginManager()
-        login.logInWithReadPermissions(["public_profile","email"], fromViewController: self) { (loginManagerLoginResult, loginError) in
+        let fbLoginManager = FBSDKLoginManager()
+        fbLoginManager.logInWithReadPermissions(["public_profile","email"], fromViewController: self) { (loginManagerLoginResult, loginError) in
             if loginError != nil {
                 print("FBLogin: \(loginError.localizedDescription)")
             } else if loginManagerLoginResult.isCancelled {
                 print("FBLogin: Cancelled")
+                fbLoginManager.logOut()
             } else {
-                self.loginButtonFacebook.hidden = true
-                self.loginButtonGoogle.hidden = true
-                self.logoutButton.hidden = false
+                self.showLoginButton(false)
                 self.returnUserData()
                 
                 if loginManagerLoginResult.declinedPermissions.count > 0 {
@@ -81,10 +77,104 @@ class ViewController: UIViewController {
     
     @IBAction func logoutPress(sender: AnyObject) {
         FBSDKLoginManager().logOut()
-        self.display.text = ""
-        self.loginButtonFacebook.hidden = false
-        self.loginButtonGoogle.hidden = false
-        self.logoutButton.hidden = true
+        self.showLoginButton(true)
+    }
+    
+    @IBAction func getFBUserData(sender: AnyObject) {
+        self.returnUserData()
+    }
+    
+    @IBAction func getFBIdsForBusiness(sender: AnyObject) {
+        self.returnBusinessUserId()
+    }
+    
+    //MARK: - button actions
+    func showLoginButton(loginButtonEnable:Bool) {
+        
+        
+        self.loginButtonFacebook.hidden = !loginButtonEnable
+        self.loginButtonGoogle.hidden = !loginButtonEnable
+        self.logoutButton.hidden = loginButtonEnable
+        
+        if loginButtonEnable {
+            self.display.text = ""
+        }
+    }
+    
+    func returnUserData()
+    {
+        let graphParameters = ["fields":"name,email"]
+        let graphRequest : FBSDKGraphRequest = FBSDKGraphRequest(graphPath: "me", parameters: graphParameters)
+        graphRequest.startWithCompletionHandler({ (connection, result, error) -> Void in
+            
+            if ((error) != nil) {
+                // Process error
+                print("Error: \(error)")
+                dispatch_async(dispatch_get_main_queue(), {
+                    self.display.text = error.localizedDescription
+                })
+            } else {
+                
+                let jsonObj = JSON(result)
+                
+                /*
+                let email = jsonObj["email"].string ?? ""
+                let name = jsonObj["name"].string ?? ""
+                let id  = jsonObj["id"].string ?? ""
+                */
+                
+                dispatch_async(dispatch_get_main_queue(), {
+                    self.display.text = result.description
+                    let tokenString = FBSDKAccessToken.currentAccessToken().tokenString
+                    print("FBToken: \(tokenString)")
+                })
+            }
+        })
+    }
+    
+    func returnBusinessUserId() {
+        let graphRequest = FBSDKGraphRequest.init(graphPath: "me/ids_for_business", parameters: nil)
+        graphRequest.startWithCompletionHandler { (graphRequestConnection, result, error) in
+            if error != nil {
+                // Process error
+                print("Error: \(error)")
+                dispatch_async(dispatch_get_main_queue(), { 
+                    self.display.text = error.localizedDescription
+                })
+            } else {
+                let jsonObj = JSON(result)
+                
+                for eachElement in jsonObj["data"].arrayValue {
+                    let id = eachElement["id"].string ?? ""
+                    let link = eachElement["app"]["link"].string ?? ""
+                    let category = eachElement["app"]["category"].string ?? ""
+                    let appId = jsonObj["data"][0]["app"]["id"].string ?? ""
+                    let name = jsonObj["data"][0]["app"]["name"].string ?? ""
+                    let namespace = jsonObj["data"][0]["app"]["namespace"].string ?? ""
+                    
+                    print("--->>>")
+                    print("id: \(id)")
+                    print("link: \(link)")
+                    print("category: \(category)")
+                    print("appId: \(appId)")
+                    print("name: \(name)")
+                    print("namespace: \(namespace)")
+                    print("---end")
+                }
+                
+//                let id = jsonObj["data"][0]["id"].string ?? ""
+//                let link = jsonObj["data"][0]["app"]["link"].string ?? ""
+//                let category = jsonObj["data"][0]["app"]["category"].string ?? ""
+//                let appId = jsonObj["data"][0]["app"]["id"].string ?? ""
+//                let name = jsonObj["data"][0]["app"]["name"].string ?? ""
+//                let namespace = jsonObj["data"][0]["app"]["namespace"].string ?? ""
+                
+                
+                dispatch_async(dispatch_get_main_queue(), {
+                    self.display.text = result.description
+                })
+            }
+        }
     }
 }
 
@@ -115,29 +205,7 @@ extension ViewController:FBSDKLoginButtonDelegate {
         print("User Logged Out")
     }
     
-    func returnUserData()
-    {
-        let graphRequest : FBSDKGraphRequest = FBSDKGraphRequest(graphPath: "me", parameters: nil)
-        graphRequest.startWithCompletionHandler({ (connection, result, error) -> Void in
-            
-            if ((error) != nil)
-            {
-                // Process error
-                print("Error: \(error)")
-            }
-            else
-            {
-                dispatch_async(dispatch_get_main_queue(), { 
-                    self.display.text = result.description
-                })
-//                print("fetched user: \(result)")
-//                let userName : NSString = result.valueForKey("name") as! NSString
-//                print("User Name is: \(userName)")
-//                let userEmail : NSString = result.valueForKey("email") as! NSString
-//                print("User Email is: \(userEmail)")
-            }
-        })
-    }
+
     
     
 }
