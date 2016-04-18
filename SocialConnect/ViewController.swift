@@ -86,6 +86,30 @@ class ViewController: UIViewController /*, GIDSignInUIDelegate, GIDSignInDelegat
         GIDSignIn.sharedInstance().signIn()
     }
     
+    //Google
+    @IBAction func getGGAccessToken(sender: AnyObject) {
+        
+        GIDSignIn.sharedInstance().currentUser?.authentication?.getTokensWithHandler { (authentication, error) in
+            if error != nil {
+                dispatch_async(dispatch_get_main_queue(), { 
+                    self.display.text = error.localizedDescription
+                })
+            } else {
+                let idToken = authentication.idToken
+                let accessToken = authentication.accessToken
+                
+                dispatch_async(dispatch_get_main_queue(), {
+                    self.display.text = "idToken: \(idToken)\n\naccessToken:\(accessToken)"
+                })
+            }
+        }
+    }
+    
+    @IBAction func ggDisconnectPress(sender: AnyObject) {
+        GIDSignIn.sharedInstance().disconnect()
+        self.updateLoginButtonStatus()
+    }
+    
     //FB
     @IBAction func logoutPress(sender: AnyObject) {
         FBSDKLoginManager().logOut()
