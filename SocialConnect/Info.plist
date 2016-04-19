@@ -33,7 +33,7 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.525420943403-epvtnse70v07iph5m00i603ppu42l87i</string>
+				<string>com.googleusercontent.apps.438709611408-slcvbeukuo3huts4uu9r3lic80500vqv</string>
 			</array>
 		</dict>
 		<dict>
@@ -50,7 +50,7 @@
 	<key>FacebookAppID</key>
 	<string>143325845706356</string>
 	<key>FacebookDisplayName</key>
-	<string>SocialConnect</string>
+	<string>Hypebeast</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>fbshareextension</string>

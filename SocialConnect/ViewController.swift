@@ -8,14 +8,48 @@
 
 import UIKit
 import FBSDKLoginKit
+
+import Alamofire
 import SwiftyJSON
+
+struct UserCredential {
+    var userID:String?
+    var userPassword:String?
+
+    init(userID:String,userPassword:String){
+        self.userID = userID
+        self.userPassword = userPassword
+    }
+}
 
 class ViewController: UIViewController /*, GIDSignInUIDelegate, GIDSignInDelegate*/ {
     
+    enum LoginType {
+        typealias Token = String
+        case Facebook(Token)
+        case Google(Token)
+        case HB(UserCredential)
+    }
+    
+    
+    
+    var currentLoginType:LoginType?
+
+    
     @IBOutlet weak var loginButtonFacebook: UIButton!
     @IBOutlet weak var loginButtonGoogle: UIButton!
+    
+    @IBOutlet weak var userIdTextField: UITextField!
+    @IBOutlet weak var passwordTextField: UITextField!
+    
+    
     @IBOutlet weak var logoutButton: UIButton!
+    
+    
+    
     @IBOutlet weak var display: UITextView!
+    @IBOutlet weak var accessTokenDisplay: UITextField!
+    @IBOutlet weak var sessionIdDisplay: UITextField!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,6 +59,7 @@ class ViewController: UIViewController /*, GIDSignInUIDelegate, GIDSignInDelegat
         //http://www.brianjcoleman.com/tutorial-how-to-use-login-in-facebook-sdk-4-0-for-swift/
         //http://stackoverflow.com/questions/31986475/fbauth2-is-missing-from-your-info-plist-under-lsapplicationqueriesschemes-and-is
         //https://developers.facebook.com/docs/ios/ios9 (IMPORTANT)
+        //http://stackoverflow.com/questions/32635644/default-fbsdkloginbehavior-native-not-working-on-ios-9 (Default FBSDKLoginBehavior.Native not working on iOS 9)
         
         
         //FB
@@ -54,8 +89,28 @@ class ViewController: UIViewController /*, GIDSignInUIDelegate, GIDSignInDelegat
         // Dispose of any resources that can be recreated.
     }
     
+    //MARK: - Common helper
+    
     func isLogin() -> Bool {
-        return FBSDKAccessToken.currentAccessToken() != nil || GIDSignIn.sharedInstance().hasAuthInKeychain()
+        if FBSDKAccessToken.currentAccessToken() != nil {
+            
+            let tokenString = FBSDKAccessToken.currentAccessToken().tokenString
+            self.currentLoginType = LoginType.Facebook(tokenString)
+            return true
+        }
+        
+        if GIDSignIn.sharedInstance().hasAuthInKeychain() {
+            
+            if let tokenString = GIDSignIn.sharedInstance().currentUser?.authentication?.accessToken {
+                self.currentLoginType = LoginType.Google(tokenString)
+                return true
+            } else {
+                GIDSignIn.sharedInstance().signInSilently()
+            }
+        }
+            
+        return false
+        //return FBSDKAccessToken.currentAccessToken() != nil || GIDSignIn.sharedInstance().hasAuthInKeychain()
     }
     
     //MARK: - IBAction
@@ -72,6 +127,15 @@ class ViewController: UIViewController /*, GIDSignInUIDelegate, GIDSignInDelegat
                 self.showLoginButton(false)
                 self.returnFBUserData()
                 
+                //---------------------------------
+                //self.currentLoginType = LoginType.Facebook(loginManagerLoginResult.token.tokenString)
+                self.currentLoginType = LoginType.Facebook(FBSDKAccessToken.currentAccessToken().tokenString)
+                //---------------------------------
+                
+                dispatch_async(dispatch_get_main_queue(), { 
+                    self.accessTokenDisplay.text = loginManagerLoginResult.token.tokenString
+                })
+                
                 if loginManagerLoginResult.declinedPermissions.count > 0 {
                     print("FBLogin: declinedPermissions")
                 } else {
@@ -81,8 +145,23 @@ class ViewController: UIViewController /*, GIDSignInUIDelegate, GIDSignInDelegat
         }
     }
     
+    //HB login
+    @IBAction func loginHBPress(sender: AnyObject) {
+        if let userId = self.userIdTextField.text,
+            let userPassword = self.passwordTextField.text {
+            
+            let credential = UserCredential.init(userID: userId, userPassword: userPassword)
+            self.currentLoginType = LoginType.HB(credential)
+            
+            self.sendAccessTokenToServer(sender)
+        }
+
+        
+    }
+    
     //Google
     @IBAction func loginGooglePress(sender: AnyObject) {
+        //GIDSignIn.sharedInstance().serverClientID = "438709611408-udbkh9caekatjl8if55n27figj35esq0.apps.googleusercontent.com"
         GIDSignIn.sharedInstance().signIn()
     }
     
@@ -91,29 +170,37 @@ class ViewController: UIViewController /*, GIDSignInUIDelegate, GIDSignInDelegat
         
         GIDSignIn.sharedInstance().currentUser?.authentication?.getTokensWithHandler { (authentication, error) in
             if error != nil {
-                dispatch_async(dispatch_get_main_queue(), { 
-                    self.display.text = error.localizedDescription
-                })
+                self.updateDisplayText(error.localizedDescription)
             } else {
                 let idToken = authentication.idToken
                 let accessToken = authentication.accessToken
                 
                 dispatch_async(dispatch_get_main_queue(), {
-                    self.display.text = "idToken: \(idToken)\n\naccessToken:\(accessToken)"
+                    self.accessTokenDisplay.text = accessToken
                 })
+                
+                print("\n\nidToken: \(idToken)")
+                print("\n\naccessToken: \(accessToken)")
+                
+                self.updateDisplayText("accessToken: \(accessToken) \n\nidToken: \(idToken)")
+                
             }
         }
     }
     
     @IBAction func ggDisconnectPress(sender: AnyObject) {
         GIDSignIn.sharedInstance().disconnect()
-        self.updateLoginButtonStatus()
+        self.logoutPress(sender)
     }
     
-    //FB
+    //Common
     @IBAction func logoutPress(sender: AnyObject) {
         FBSDKLoginManager().logOut()
         GIDSignIn.sharedInstance().signOut()
+        
+        //reset the curretLoginType to nil
+        self.currentLoginType = nil
+        
         self.showLoginButton(true)
     }
     
@@ -127,36 +214,113 @@ class ViewController: UIViewController /*, GIDSignInUIDelegate, GIDSignInDelegat
         self.returnFBBusinessUserId()
     }
     
-    //MARK: - button actions
+    //Common
+    @IBAction func sendAccessTokenToServer(sender: AnyObject) {
+        let header:[String:String] = ["Content-Type":"application/json","Accept":"application/json"]
+        self.updateDisplayText("")
+        
+        if let loginType = self.currentLoginType {
+            switch loginType {
+            case LoginType.Facebook(let tokenString):
+                let urlString = "https://hbx.com/login/check-facebook?access_token=\(tokenString)"
+                print("Facebook: \(urlString)")
+                Alamofire.request(.GET, urlString, parameters: nil, encoding: .URL , headers:header).responseJSON { response in
+                    switch response.result {
+                    case .Failure(let error):
+                        print("Failure")
+                        self.updateDisplayText(error.localizedDescription)
+                    case .Success(let returnJson):
+                        print("Success")
+                        let jsonObj = JSON(returnJson)
+                        self.updateDisplayText(jsonObj.description)
+                    }
+                }
+                
+            case LoginType.Google(let tokenString):
+                let urlString = "https://hbx.com/login/check-google?access_token=\(tokenString)"
+                print("Google: \(urlString)")
+                Alamofire.request(.GET, urlString, parameters: nil, encoding: .URL , headers:header).responseJSON { response in
+                    switch response.result {
+                    case .Failure(let error):
+                        print("Failure")
+                        self.updateDisplayText(error.localizedDescription)
+                    case .Success(let returnJson):
+                        print("Success")
+                        let jsonObj = JSON(returnJson)
+                        self.updateDisplayText(jsonObj.description)
+                    }
+                }
+            case LoginType.HB(let userCredential):
+                if let userId = userCredential.userID,
+                    userPassword = userCredential.userPassword {
+                    let urlString = "https://hbx.com/login/check-HB?userId=\(userId)&pwd=\(userPassword)"
+                    
+                    print("HB: \(urlString)")
+                    Alamofire.request(.GET, urlString, parameters: nil, encoding: .URL , headers:header).responseJSON { response in
+                        switch response.result {
+                        case .Failure(let error):
+                            print("Failure")
+                            self.updateDisplayText(error.localizedDescription)
+                        case .Success(let returnJson):
+                            print("Success")
+                            let jsonObj = JSON(returnJson)
+                            self.updateDisplayText(jsonObj.description)
+                        }
+                    }
+                    
+                    
+                }
+            } //end switch
+        }
+    }
+    
+    
+    //MARK: UI update
     func showLoginButton(loginButtonEnable:Bool) {
-        self.updateLoginButtonStatus()
-        /*
-        dispatch_async(dispatch_get_main_queue()) { 
+        //self.updateLoginButtonStatus()
+        
+        dispatch_async(dispatch_get_main_queue()) {
             self.loginButtonFacebook.hidden = !loginButtonEnable
             self.loginButtonGoogle.hidden = !loginButtonEnable
             self.logoutButton.hidden = loginButtonEnable
             
             if loginButtonEnable {
                 self.display.text = ""
+                self.accessTokenDisplay.text = ""
+                self.sessionIdDisplay.text = ""
             }
-        } 
-        */
+        }
+        
     }
     
-    func updateLoginButtonStatus() {
-        let isLogin = self.isLogin()
-        dispatch_async(dispatch_get_main_queue()) {
-            self.loginButtonFacebook.hidden = isLogin
-            self.loginButtonGoogle.hidden = isLogin
-            self.logoutButton.hidden = !isLogin
-            
-            if !isLogin {
-                self.display.text = ""
+    func updateDisplayText(withText:String?) {
+        if let _ = withText {
+            dispatch_async(dispatch_get_main_queue()) {
+                self.display.text = withText!
             }
         }
     }
     
-    //FB
+//    func updateLoginButtonStatus() {
+//        let isLogin = self.isLogin()
+//        dispatch_async(dispatch_get_main_queue()) {
+//            self.loginButtonFacebook.hidden = isLogin
+//            self.loginButtonGoogle.hidden = isLogin
+//            self.logoutButton.hidden = !isLogin
+//            
+//            if !isLogin {
+//                self.display.text = ""
+//                self.accessTokenDisplay.text = ""
+//                self.sessionIdDisplay.text = ""
+//            }
+//        }
+//    }
+    
+    
+    
+    
+    
+    //MARK: Facebook helper function
     func returnFBUserData() {
         let graphParameters = ["fields":"name,email"]
         let graphRequest : FBSDKGraphRequest = FBSDKGraphRequest(graphPath: "me", parameters: graphParameters)
@@ -165,9 +329,7 @@ class ViewController: UIViewController /*, GIDSignInUIDelegate, GIDSignInDelegat
             if ((error) != nil) {
                 // Process error
                 print("Error: \(error)")
-                dispatch_async(dispatch_get_main_queue(), {
-                    self.display.text = error.localizedDescription
-                })
+                self.updateDisplayText(error.localizedDescription)
             } else {
                 
                 let jsonObj = JSON(result)
@@ -178,11 +340,11 @@ class ViewController: UIViewController /*, GIDSignInUIDelegate, GIDSignInDelegat
                 let id  = jsonObj["id"].string ?? ""
                 */
                 
-                dispatch_async(dispatch_get_main_queue(), {
-                    self.display.text = result.description
-                    let tokenString = FBSDKAccessToken.currentAccessToken().tokenString
-                    print("FBToken: \(tokenString)")
-                })
+                self.updateDisplayText(jsonObj.description)
+                
+                let tokenString = FBSDKAccessToken.currentAccessToken().tokenString
+                print("FBToken: \(tokenString)")
+
             }
         })
     }
@@ -194,9 +356,9 @@ class ViewController: UIViewController /*, GIDSignInUIDelegate, GIDSignInDelegat
             if error != nil {
                 // Process error
                 print("Error: \(error)")
-                dispatch_async(dispatch_get_main_queue(), { 
-                    self.display.text = error.localizedDescription
-                })
+                
+                self.updateDisplayText(error.localizedDescription)
+                
             } else {
                 let jsonObj = JSON(result)
                 
@@ -226,23 +388,22 @@ class ViewController: UIViewController /*, GIDSignInUIDelegate, GIDSignInDelegat
 //                let namespace = jsonObj["data"][0]["app"]["namespace"].string ?? ""
                 
                 
-                dispatch_async(dispatch_get_main_queue(), {
-                    self.display.text = result.description
-                })
+                self.updateDisplayText(jsonObj.description)
             }
         }
     }
  
 }
 
+//MARK: - GIDSignInUIDelegate
 extension ViewController: GIDSignInUIDelegate {
     
-    //MARK: - GIDSignInUIDelegate
 }
 
+//MARK: - GIDSignInDelegate
 extension ViewController: GIDSignInDelegate {
     
-    //MARK: - GIDSignInDelegate
+    
     func signIn(signIn: GIDSignIn!, didSignInForUser user: GIDGoogleUser!,  withError error: NSError!) {
         if (error == nil) {
             // Perform any operations on signed in user here.
@@ -252,7 +413,16 @@ extension ViewController: GIDSignInDelegate {
             let givenName = user.profile.givenName
             let familyName = user.profile.familyName
             let email = user.profile.email
+            let accessToken = user.authentication.accessToken
             // ...
+            
+            //---------------------------------
+            self.currentLoginType = LoginType.Google(accessToken)
+            //---------------------------------
+            
+            dispatch_async(dispatch_get_main_queue(), {
+                self.accessTokenDisplay.text = accessToken
+            })
             
             self.showLoginButton(false)
             print(user.description)
@@ -268,10 +438,9 @@ extension ViewController: GIDSignInDelegate {
 }
 
 
-
+//MARK: - FBSDKLoginButtonDelegate (For Facebook login button, can be remove)
 extension ViewController:FBSDKLoginButtonDelegate {
     
-    //MARK: - FBSDKLoginButtonDelegate
     func loginButton(loginButton: FBSDKLoginButton!, didCompleteWithResult result: FBSDKLoginManagerLoginResult!, error: NSError!) {
         print("User Logged In")
         
