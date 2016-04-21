@@ -25,9 +25,10 @@ struct UserCredential {
 class ViewController: UIViewController /*, GIDSignInUIDelegate, GIDSignInDelegate*/ {
     
     enum LoginType {
-        typealias Token = String
-        case Facebook(Token)
-        case Google(Token)
+        
+        typealias TokenString = String
+        case Facebook(TokenString)
+        case Google(TokenString)
         case HB(UserCredential)
     }
     
@@ -62,7 +63,6 @@ class ViewController: UIViewController /*, GIDSignInUIDelegate, GIDSignInDelegat
         //http://stackoverflow.com/questions/32635644/default-fbsdkloginbehavior-native-not-working-on-ios-9 (Default FBSDKLoginBehavior.Native not working on iOS 9)
         
         
-        //FB
         if self.isLogin() {
             // User is already logged in, do work such as go to next view controller.
             self.showLoginButton(false)
@@ -165,9 +165,50 @@ class ViewController: UIViewController /*, GIDSignInUIDelegate, GIDSignInDelegat
         GIDSignIn.sharedInstance().signIn()
     }
     
+    //FB
+    @IBAction func getFBAccessToken(sender: AnyObject) {
+        if let tokenString = FBSDKAccessToken.currentAccessToken()?.tokenString {
+            
+            
+            dispatch_async(dispatch_get_main_queue(), {
+                self.accessTokenDisplay.text = tokenString
+            })
+            
+            print("FB Access Token: \(tokenString)")
+            self.updateDisplayText("accessToken: \(tokenString)")
+        } else {
+            
+            dispatch_async(dispatch_get_main_queue(), {
+                self.accessTokenDisplay.text = ""
+            })
+            self.updateDisplayText("Please login")
+        }
+    }
+    
     //Google
     @IBAction func getGGAccessToken(sender: AnyObject) {
         
+        if let authentication = GIDSignIn.sharedInstance().currentUser?.authentication {
+            let idToken = authentication.idToken
+            let accessToken = authentication.accessToken
+            
+            dispatch_async(dispatch_get_main_queue(), {
+                self.accessTokenDisplay.text = accessToken
+            })
+            
+            print("\n\nidToken: \(idToken)")
+            print("\n\nGoogle assessToken: \(accessToken)")
+            
+            self.updateDisplayText("accessToken: \(accessToken) \n\nidToken: \(idToken)")
+            
+        } else {
+            dispatch_async(dispatch_get_main_queue(), {
+                self.accessTokenDisplay.text = ""
+            })
+            self.updateDisplayText("Please login")
+        }
+        
+        /*
         GIDSignIn.sharedInstance().currentUser?.authentication?.getTokensWithHandler { (authentication, error) in
             if error != nil {
                 self.updateDisplayText(error.localizedDescription)
@@ -180,17 +221,20 @@ class ViewController: UIViewController /*, GIDSignInUIDelegate, GIDSignInDelegat
                 })
                 
                 print("\n\nidToken: \(idToken)")
-                print("\n\naccessToken: \(accessToken)")
+                print("\n\nGoogle assessToken: \(accessToken)")
                 
                 self.updateDisplayText("accessToken: \(accessToken) \n\nidToken: \(idToken)")
                 
             }
-        }
+        } */
     }
     
+    
+    //Google
     @IBAction func ggDisconnectPress(sender: AnyObject) {
         GIDSignIn.sharedInstance().disconnect()
-        self.logoutPress(sender)
+        
+        self.showLoginButton(true)
     }
     
     //Common
@@ -202,6 +246,11 @@ class ViewController: UIViewController /*, GIDSignInUIDelegate, GIDSignInDelegat
         self.currentLoginType = nil
         
         self.showLoginButton(true)
+    }
+    
+    //Google
+    @IBAction func getGoogleUserData(sender: AnyObject) {
+        self.returnGoogleUserData()
     }
     
     //FB
@@ -318,7 +367,18 @@ class ViewController: UIViewController /*, GIDSignInUIDelegate, GIDSignInDelegat
     
     
     
-    
+    //MARK: Google help function 
+    func returnGoogleUserData() {
+        if let googleUser = GIDSignIn.sharedInstance().currentUser {
+            let userID = googleUser.userID
+            let userProfile = googleUser.profile
+            let userName = userProfile.name
+            let userEmail = userProfile.email
+            self.updateDisplayText("userID: \(userID), userName: \(userName), userEmail: \(userEmail)")
+        } else {
+            self.updateDisplayText("Please login")
+        }
+    }
     
     //MARK: Facebook helper function
     func returnFBUserData() {
@@ -341,10 +401,6 @@ class ViewController: UIViewController /*, GIDSignInUIDelegate, GIDSignInDelegat
                 */
                 
                 self.updateDisplayText(jsonObj.description)
-                
-                let tokenString = FBSDKAccessToken.currentAccessToken().tokenString
-                print("FBToken: \(tokenString)")
-
             }
         })
     }
@@ -425,7 +481,14 @@ extension ViewController: GIDSignInDelegate {
             })
             
             self.showLoginButton(false)
-            print(user.description)
+            
+            let userID = user.userID
+            let userProfile = user.profile
+            let userName = userProfile.name
+            let userEmail = userProfile.email
+            
+            self.updateDisplayText("userID: \(userID), userName: \(userName), userEmail: \(userEmail)")
+            
         } else {
             print("\(error.localizedDescription)")
         }
