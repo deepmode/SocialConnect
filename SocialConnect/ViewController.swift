@@ -22,6 +22,17 @@ struct UserCredential {
     }
 }
 
+struct HBConstants {
+    static let host = "https://hypebeast.com"
+    
+    struct LoginPath{
+        static let checkFacebook = "/login/check-facebook"
+        static let checkGoogle = "/login/check-google"
+        static let checkEmail = "/login_check"
+        static let checkSignUp = "/register"
+    }
+}
+
 class ViewController: UIViewController /*, GIDSignInUIDelegate, GIDSignInDelegate*/ {
     
     enum LoginType {
@@ -95,14 +106,19 @@ class ViewController: UIViewController /*, GIDSignInUIDelegate, GIDSignInDelegat
         if FBSDKAccessToken.currentAccessToken() != nil {
             
             let tokenString = FBSDKAccessToken.currentAccessToken().tokenString
+            //---------------------------------
             self.currentLoginType = LoginType.Facebook(tokenString)
+            //---------------------------------
+            
             return true
         }
         
         if GIDSignIn.sharedInstance().hasAuthInKeychain() {
             
             if let tokenString = GIDSignIn.sharedInstance().currentUser?.authentication?.accessToken {
+                //---------------------------------
                 self.currentLoginType = LoginType.Google(tokenString)
+                //---------------------------------
                 return true
             } else {
                 GIDSignIn.sharedInstance().signInSilently()
@@ -151,7 +167,10 @@ class ViewController: UIViewController /*, GIDSignInUIDelegate, GIDSignInDelegat
             let userPassword = self.passwordTextField.text {
             
             let credential = UserCredential.init(userID: userId, userPassword: userPassword)
+            
+            //---------------------------------
             self.currentLoginType = LoginType.HB(credential)
+            //---------------------------------
             
             self.sendAccessTokenToServer(sender)
         }
@@ -267,11 +286,11 @@ class ViewController: UIViewController /*, GIDSignInUIDelegate, GIDSignInDelegat
     @IBAction func sendAccessTokenToServer(sender: AnyObject) {
         let header:[String:String] = ["Content-Type":"application/json","Accept":"application/json"]
         self.updateDisplayText("")
-        
+        let host = HBConstants.host
         if let loginType = self.currentLoginType {
             switch loginType {
             case LoginType.Facebook(let tokenString):
-                let urlString = "https://hbx.com/login/check-facebook?access_token=\(tokenString)"
+                let urlString = "\(host)\(HBConstants.LoginPath.checkFacebook)?access_token=\(tokenString)"
                 print("Facebook: \(urlString)")
                 Alamofire.request(.GET, urlString, parameters: nil, encoding: .URL , headers:header).responseJSON { response in
                     switch response.result {
@@ -286,7 +305,7 @@ class ViewController: UIViewController /*, GIDSignInUIDelegate, GIDSignInDelegat
                 }
                 
             case LoginType.Google(let tokenString):
-                let urlString = "https://hbx.com/login/check-google?access_token=\(tokenString)"
+                let urlString = "\(host)\(HBConstants.LoginPath.checkGoogle)?access_token=\(tokenString)"
                 print("Google: \(urlString)")
                 Alamofire.request(.GET, urlString, parameters: nil, encoding: .URL , headers:header).responseJSON { response in
                     switch response.result {
@@ -302,10 +321,10 @@ class ViewController: UIViewController /*, GIDSignInUIDelegate, GIDSignInDelegat
             case LoginType.HB(let userCredential):
                 if let userId = userCredential.userID,
                     userPassword = userCredential.userPassword {
-                    let urlString = "https://hbx.com/login/check-HB?userId=\(userId)&pwd=\(userPassword)"
+                    let urlString = "\(host)\(HBConstants.LoginPath.checkEmail)"
+                    let parameters = ["_username":userId, "_password":userPassword]
                     
-                    print("HB: \(urlString)")
-                    Alamofire.request(.GET, urlString, parameters: nil, encoding: .URL , headers:header).responseJSON { response in
+                    Alamofire.request(.POST, urlString, parameters: parameters, encoding: .JSON, headers:header).responseJSON { response in
                         switch response.result {
                         case .Failure(let error):
                             print("Failure")
